@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>天空岛 · Floating Sky Island Diorama</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <!-- Top-left Stats HUD -->
+  <div id="stats-panel" class="glass-panel hud-element">
+    <div class="title-zh">天空岛</div>
+    <div class="title-en">FLOATING SKY ISLAND DIORAMA</div>
+    <div class="stats-grid">
+      <span class="stat-label">FPS</span><span id="stat-fps" class="stat-value">60</span>
+      <span class="stat-label">DrawCalls</span><span id="stat-calls" class="stat-value">0</span>
+      <span class="stat-label">Triangles</span><span id="stat-tris" class="stat-value">0</span>
+      <span class="stat-label">Objects</span><span id="stat-objs" class="stat-value">0</span>
+    </div>
+  </div>
+
+  <!-- Top-right Camera Selector -->
+  <div id="camera-bar" class="glass-panel hud-element">
+    <button class="pill-btn active" data-cam="orbit">全景环岛</button>
+    <button class="pill-btn" data-cam="train3rd">火车 · 第三人称</button>
+    <button class="pill-btn" data-cam="train1st">火车 · 第一人称</button>
+    <button class="pill-btn" data-cam="airship">飞艇甲板</button>
+  </div>
+
+  <!-- Bottom-center Control Dock -->
+  <div id="control-dock" class="glass-panel hud-element">
+    <div class="dock-group">
+      <span class="dock-label">时段</span>
+      <button class="pill-btn active" data-time="day">晴朗白昼</button>
+      <button class="pill-btn" data-time="dusk">金色黄昏</button>
+      <button class="pill-btn" data-time="night">星夜灯火</button>
+    </div>
+    <div class="dock-divider"></div>
+    <div class="dock-group">
+      <span class="dock-label">车速</span>
+      <input id="speed-slider" type="range" min="0" max="2.5" step="0.1" value="1.0" />
+    </div>
+    <div class="dock-divider"></div>
+    <button id="whistle-btn" class="pill-btn whistle-btn">🚂 鸣笛</button>
+  </div>
+
+  <!-- Bottom Shortcut Hints -->
+  <div id="shortcut-hints" class="hud-element">
+    拖动旋转 · 滚轮缩放 · 右键平移 · 1-4 切换视角 · Q/W/E 切换时段 · H 隐藏面板 · 空格鸣笛
+  </div>
+
+  <!-- Bottom-right Toggle HUD Button -->
+  <button id="toggle-hud-btn" class="glass-panel">隐藏面板</button>
+
+  <!-- Three.js & Postprocessing (UMD for file:// and http:// compatibility) -->
+  <script src="https://unpkg.com/three@0.137.5/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.137.5/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://unpkg.com/three@0.137.5/examples/js/shaders/CopyShader.js"></script>
+  <script src="https://unpkg.com/three@0.137.5/examples/js/shaders/LuminosityHighPassShader.js"></script>
+  <script src="https://unpkg.com/three@0.137.5/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://unpkg.com/three@0.137.5/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://unpkg.com/three@0.137.5/examples/js/postprocessing/ShaderPass.js"></script>
+  <script src="https://unpkg.com/three@0.137.5/examples/js/postprocessing/UnrealBloomPass.js"></script>
+
+  <script src="js/terrain.js"></script>
+  <script src="js/architecture.js"></script>
+  <script src="js/train.js"></script>
+  <script src="js/airship.js"></script>
+  <script src="js/atmosphere.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
