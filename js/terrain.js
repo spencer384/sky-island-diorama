@@ -235,12 +235,51 @@ window.SkyTerrain = (function () {
       vertexColors: true,
       roughness: 0.95,
       metalness: 0.04,
-      flatShading: true
+      flatShading: true,
+      side: THREE.DoubleSide
     });
     const underMesh = new THREE.Mesh(underGeo, underMat);
     underMesh.castShadow = true;
     underMesh.receiveShadow = true;
     group.add(underMesh);
+
+    // 2.5 Rocky skirt sealing the gap between top terrain rim and underbelly
+    const skirtPos = [];
+    const skirtCol = [];
+    const skirtIdx = [];
+    const skirtSegs = 72;
+    for (let ia = 0; ia <= skirtSegs; ia++) {
+      const angle = (ia / skirtSegs) * Math.PI * 2;
+      const maxR = getEdgeRadius(angle);
+      const x = Math.cos(angle) * maxR;
+      const z = Math.sin(angle) * maxR;
+      const topY = getTerrainHeight(x, z);
+      const botY = topY - 1.8;
+
+      skirtPos.push(x, topY, z);
+      skirtPos.push(x * 0.985, botY, z * 0.985);
+
+      skirtCol.push(rockLight.r, rockLight.g, rockLight.b);
+      skirtCol.push(rockDark.r, rockDark.g, rockDark.b);
+
+      if (ia < skirtSegs) {
+        const a = ia * 2;
+        const b = a + 1;
+        const c = a + 2;
+        const d = a + 3;
+        skirtIdx.push(a, b, d);
+        skirtIdx.push(a, d, c);
+      }
+    }
+    const skirtGeo = new THREE.BufferGeometry();
+    skirtGeo.setAttribute('position', new THREE.Float32BufferAttribute(skirtPos, 3));
+    skirtGeo.setAttribute('color', new THREE.Float32BufferAttribute(skirtCol, 3));
+    skirtGeo.setIndex(skirtIdx);
+    skirtGeo.computeVertexNormals();
+    const skirtMesh = new THREE.Mesh(skirtGeo, underMat);
+    skirtMesh.castShadow = true;
+    skirtMesh.receiveShadow = true;
+    group.add(skirtMesh);
 
     // 3. Hanging roots / vines under the island
     const vineMat = new THREE.MeshStandardMaterial({

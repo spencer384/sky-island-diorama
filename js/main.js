@@ -36,7 +36,7 @@
   controls.target.set(0, 3.5, 0);
   controls.minDistance = 12;
   controls.maxDistance = 140;
-  controls.maxPolarAngle = Math.PI * 0.72;
+  controls.maxPolarAngle = Math.PI * 0.95;
 
   // Build world modules
   const trackCurve = window.SkyTrain.createTrackCurve();
