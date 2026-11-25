@@ -7,15 +7,19 @@ window.SkyArchitecture = (function () {
 
     const getH = window.SkyTerrain.getTerrainHeight;
 
-    // Shared materials
-    const creamWall = new THREE.MeshStandardMaterial({ color: '#f2e5cb', roughness: 0.84 });
-    const stoneMat = new THREE.MeshStandardMaterial({ color: '#837c72', roughness: 0.92, flatShading: true });
-    const woodMat = new THREE.MeshStandardMaterial({ color: '#6b472b', roughness: 0.9 });
-    const darkWoodMat = new THREE.MeshStandardMaterial({ color: '#452b18', roughness: 0.9 });
-    const roofRed = new THREE.MeshStandardMaterial({ color: '#c43d2c', roughness: 0.74 });
-    const roofBlue = new THREE.MeshStandardMaterial({ color: '#2b5d94', roughness: 0.74 });
-    const roofBrown = new THREE.MeshStandardMaterial({ color: '#7d4a28', roughness: 0.8 });
-    const bronzeMat = new THREE.MeshStandardMaterial({ color: '#a8652e', roughness: 0.38, metalness: 0.5 });
+    // Shared vibrant Animal Crossing style materials
+    const creamWall = new THREE.MeshStandardMaterial({ color: '#fff5df', roughness: 0.65 });
+    const woodWall = new THREE.MeshStandardMaterial({ color: '#f3c98b', roughness: 0.7 });
+    const stoneMat = new THREE.MeshStandardMaterial({ color: '#a0998f', roughness: 0.8 });
+    const woodMat = new THREE.MeshStandardMaterial({ color: '#96603a', roughness: 0.75 });
+    const darkWoodMat = new THREE.MeshStandardMaterial({ color: '#683e20', roughness: 0.8 });
+    const roofRed = new THREE.MeshStandardMaterial({ color: '#f04b4b', roughness: 0.45 });
+    const roofOrange = new THREE.MeshStandardMaterial({ color: '#ff8a3d', roughness: 0.45 });
+    const roofBlue = new THREE.MeshStandardMaterial({ color: '#38a3ff', roughness: 0.45 });
+    const roofYellow = new THREE.MeshStandardMaterial({ color: '#ffd033', roughness: 0.45 });
+    const roofGreen = new THREE.MeshStandardMaterial({ color: '#44c965', roughness: 0.45 });
+    const roofPurple = new THREE.MeshStandardMaterial({ color: '#b066ff', roughness: 0.45 });
+    const bronzeMat = new THREE.MeshStandardMaterial({ color: '#d98b48', roughness: 0.35, metalness: 0.25 });
 
     const glowMat = new THREE.MeshStandardMaterial({
       color: '#fff1c4',
@@ -213,7 +217,7 @@ window.SkyArchitecture = (function () {
       group.add(wm);
     });
 
-    // 4. Village Cottages
+    // 4. Village Cottages (Cozy Animal Crossing style houses with round chimneys & colorful roofs)
     function createCottage(x, z, rotY, roofMat, scale = 1, hasWatermill = false) {
       const y = getH(x, z);
       const house = new THREE.Group();
@@ -224,27 +228,48 @@ window.SkyArchitecture = (function () {
       walls.receiveShadow = true;
       house.add(walls);
 
-      // Pitched prism roof
-      const roof = new THREE.Mesh(new THREE.ConeGeometry(1.88, 1.35, 4), roofMat);
+      // Cute wooden base trim
+      const baseTrim = new THREE.Mesh(new THREE.BoxGeometry(2.38, 0.25, 2.08), woodMat);
+      baseTrim.position.y = 0.125;
+      house.add(baseTrim);
+
+      // Rounded overhang roof
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(1.95, 1.45, 4), roofMat);
       roof.rotation.y = Math.PI / 4;
-      roof.scale.set(1.05, 1, 0.95);
-      roof.position.y = 2.3;
+      roof.scale.set(1.1, 0.95, 1.0);
+      roof.position.y = 2.35;
       roof.castShadow = true;
       house.add(roof);
 
-      // Chimney
-      const chim = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.9, 0.32), stoneMat);
-      chim.position.set(0.65, 2.4, -0.35);
+      // Round cartoon chimney with white smoke puff
+      const chim = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.85, 8), stoneMat);
+      chim.position.set(0.65, 2.45, -0.35);
       house.add(chim);
+      const smokePuff = new THREE.Mesh(
+        new THREE.SphereGeometry(0.25, 8, 8),
+        new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.9, transparent: true, opacity: 0.85 })
+      );
+      smokePuff.position.set(0.65, 3.0, -0.35);
+      house.add(smokePuff);
 
-      // Door & windows
-      const door = new THREE.Mesh(new THREE.PlaneGeometry(0.45, 0.8), darkWoodMat);
-      door.position.set(0, 0.42, 1.01);
+      // Cute rounded door & handle
+      const door = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.95), darkWoodMat);
+      door.position.set(0, 0.5, 1.01);
       house.add(door);
+      const doorKnob = new THREE.Mesh(
+        new THREE.SphereGeometry(0.05, 6, 6),
+        new THREE.MeshStandardMaterial({ color: '#ffdd55', roughness: 0.3, metalness: 0.6 })
+      );
+      doorKnob.position.set(0.18, 0.5, 1.03);
+      house.add(doorKnob);
 
+      // Windows with cute wooden frames
       [-0.65, 0.65].forEach((wx) => {
+        const frame = new THREE.Mesh(new THREE.PlaneGeometry(0.52, 0.52), woodMat);
+        frame.position.set(wx, 0.95, 1.008);
+        house.add(frame);
         const win = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.42), glowMat);
-        win.position.set(wx, 0.95, 1.01);
+        win.position.set(wx, 0.95, 1.015);
         house.add(win);
       });
       [-1.16, 1.16].forEach((sx) => {
@@ -254,18 +279,31 @@ window.SkyArchitecture = (function () {
         house.add(win);
       });
 
+      // Front porch flower box!
+      const planter = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.18, 0.25), woodMat);
+      planter.position.set(0.65, 0.35, 1.12);
+      house.add(planter);
+      for (let p = 0; p < 3; p++) {
+        const flower = new THREE.Mesh(
+          new THREE.SphereGeometry(0.08, 6, 6),
+          new THREE.MeshStandardMaterial({ color: ['#ff3366', '#ffdd00', '#33aaff'][p], roughness: 0.5 })
+        );
+        flower.position.set(0.45 + p * 0.2, 0.48, 1.12);
+        house.add(flower);
+      }
+
       let wheel = null;
       if (hasWatermill) {
         wheel = new THREE.Group();
-        const rim = new THREE.Mesh(new THREE.TorusGeometry(0.82, 0.08, 6, 14), woodMat);
+        const rim = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.1, 8, 16), woodMat);
         rim.rotation.y = Math.PI / 2;
         wheel.add(rim);
         for (let i = 0; i < 6; i++) {
-          const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.65, 0.14), darkWoodMat);
+          const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.7, 0.16), darkWoodMat);
           spoke.rotation.x = (i * Math.PI) / 6;
           wheel.add(spoke);
         }
-        wheel.position.set(1.32, 0.65, 0);
+        wheel.position.set(1.35, 0.65, 0);
         house.add(wheel);
       }
 
@@ -278,13 +316,13 @@ window.SkyArchitecture = (function () {
     }
 
     const watermillWheel = createCottage(-3.8, 7.2, 0.35, roofRed, 1.0, true);
-    createCottage(-9.8, 3.2, 0.5, roofRed, 0.95);
-    createCottage(-5.5, 2.2, 0.15, roofBrown, 0.9);
+    createCottage(-9.8, 3.2, 0.5, roofOrange, 0.95);
+    createCottage(-5.5, 2.2, 0.15, roofYellow, 0.9);
     createCottage(3.5, 1.8, -0.45, roofBlue, 0.95);
-    createCottage(4.5, -4.5, -0.2, roofRed, 0.92);
-    createCottage(-3.2, -7.8, 0.25, roofBlue, 0.88);
+    createCottage(4.5, -4.5, -0.2, roofGreen, 0.92);
+    createCottage(-3.2, -7.8, 0.25, roofPurple, 0.88);
     createCottage(9.5, -9.5, -0.5, roofRed, 0.9);
-    createCottage(-12.5, -3.5, 0.7, roofBrown, 0.85);
+    createCottage(-12.5, -3.5, 0.7, roofOrange, 0.85);
 
     // 5. Wooden Footbridge across the river in village center (z = 2.8)
     (function buildFootbridge() {

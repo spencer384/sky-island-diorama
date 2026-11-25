@@ -157,15 +157,16 @@ window.SkyAtmosphere = (function () {
 
     function setTimeMode(mode) {
       if (mode === 'day') {
-        skyUniforms.topColor.value.set('#2c7cd1');
-        skyUniforms.bottomColor.value.set('#b8e2ff');
-        scene.fog = new THREE.FogExp2('#b8e2ff', 0.0010);
-        hemiLight.color.set('#9fd8ff');
-        hemiLight.groundColor.set('#2f5222');
-        hemiLight.intensity = 0.52;
-        sunLight.color.set('#fff9ed');
-        sunLight.intensity = 1.55;
-        sunLight.position.set(42, 58, 32);
+        // Bright, cheerful Animal Crossing blue sky
+        skyUniforms.topColor.value.set('#3895e8');
+        skyUniforms.bottomColor.value.set('#e2f4ff');
+        scene.fog = new THREE.FogExp2('#d5eefa', 0.0006);
+        hemiLight.color.set('#cceaff');
+        hemiLight.groundColor.set('#558a2d');
+        hemiLight.intensity = 0.65;
+        sunLight.color.set('#fffbf0');
+        sunLight.intensity = 1.45;
+        sunLight.position.set(40, 55, 30);
         cloudMat.color.set('#ffffff');
         starMat.opacity = 0;
         ffMat.opacity = 0;

@@ -122,10 +122,12 @@ window.SkyTerrain = (function () {
     const colors = [];
     const indices = [];
 
-    const grassLow = new THREE.Color('#3f9627');
-    const grassHigh = new THREE.Color('#65c43b');
-    const rockSlope = new THREE.Color('#7c5c40');
-    const riverBed = new THREE.Color('#376473');
+    // Vibrant Animal Crossing grass & rock tones (rich emerald/lime greens, warm cookie/terracotta soils)
+    const grassLow = new THREE.Color('#46b033');
+    const grassHigh = new THREE.Color('#82e340');
+    const grassHighlight = new THREE.Color('#a8f255');
+    const rockSlope = new THREE.Color('#946f49');
+    const riverBed = new THREE.Color('#3889a8');
 
     for (let ir = 0; ir <= ringSegs; ir++) {
       const frac = ir / ringSegs;
@@ -443,16 +445,24 @@ window.SkyTerrain = (function () {
       islets.push(islet);
     });
 
-    // 6. Trees, Rocks & Flowers
-    const trunkMat = new THREE.MeshStandardMaterial({ color: '#5c3b24', roughness: 0.92 });
-    const pineMats = [
-      new THREE.MeshStandardMaterial({ color: '#186629', roughness: 0.85, flatShading: true }),
-      new THREE.MeshStandardMaterial({ color: '#217d33', roughness: 0.85, flatShading: true }),
-      new THREE.MeshStandardMaterial({ color: '#2c943e', roughness: 0.85, flatShading: true })
+    // 6. Cute Animal Crossing Style Trees, Shrubs, Fruit, Mushrooms & Flowers
+    const trunkMat = new THREE.MeshStandardMaterial({ color: '#7a4e2d', roughness: 0.85 });
+    const acPineMats = [
+      new THREE.MeshStandardMaterial({ color: '#1eb85a', roughness: 0.75, flatShading: false }),
+      new THREE.MeshStandardMaterial({ color: '#2cd66d', roughness: 0.75, flatShading: false }),
+      new THREE.MeshStandardMaterial({ color: '#4ee888', roughness: 0.75, flatShading: false })
     ];
-    const leafMat = new THREE.MeshStandardMaterial({ color: '#45a82c', roughness: 0.84, flatShading: true });
-    const bushMat = new THREE.MeshStandardMaterial({ color: '#388e25', roughness: 0.88, flatShading: true });
-    const rockMat = new THREE.MeshStandardMaterial({ color: '#787269', roughness: 0.94, flatShading: true });
+    const acDeciduousMats = [
+      new THREE.MeshStandardMaterial({ color: '#68d638', roughness: 0.72 }),
+      new THREE.MeshStandardMaterial({ color: '#82e848', roughness: 0.72 }),
+      new THREE.MeshStandardMaterial({ color: '#ff8fb1', roughness: 0.72 }) // Cherry blossom / Sakura tree!
+    ];
+    const fruitAppleMat = new THREE.MeshStandardMaterial({ color: '#ff3344', roughness: 0.35 });
+    const fruitOrangeMat = new THREE.MeshStandardMaterial({ color: '#ff9514', roughness: 0.35 });
+    const bushMat = new THREE.MeshStandardMaterial({ color: '#52c938', roughness: 0.8 });
+    const rockMat = new THREE.MeshStandardMaterial({ color: '#8e8b82', roughness: 0.88, flatShading: false });
+    const mushroomCapMat = new THREE.MeshStandardMaterial({ color: '#ff3855', roughness: 0.4 });
+    const mushroomStemMat = new THREE.MeshStandardMaterial({ color: '#fff9ea', roughness: 0.6 });
 
     // Deterministic pseudo-random helper
     let seed = 42;
@@ -465,15 +475,10 @@ window.SkyTerrain = (function () {
       const r = Math.hypot(x, z);
       const angle = Math.atan2(z, x);
       if (r > getEdgeRadius(angle) - 2.2) return false;
-      // Keep crater lake clear
       if (Math.hypot(x - CRATER_X, z - CRATER_Z) < 6.4) return false;
-      // Keep river clear
       if (z > -12 && Math.abs(x - getRiverX(z)) < 3.4) return false;
-      // Keep central village plaza clear
       if (Math.hypot(x + 1, z - 2) < 9.5) return false;
-      // Keep dock entrance clear
       if (x > 26 && Math.abs(z - 2) < 4.5) return false;
-      // Keep railway track clear
       if (trackCurve) {
         for (let i = 0; i < 64; i++) {
           const pt = trackCurve.getPointAt(i / 64);
@@ -483,20 +488,21 @@ window.SkyTerrain = (function () {
       return true;
     }
 
-    function addPineTree(x, z, scale) {
+    // Chubby Tiered Pine (Animal Crossing Cedar)
+    function addCutePineTree(x, z, scale) {
       const y = getTerrainHeight(x, z);
       const tree = new THREE.Group();
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.28, 1.2, 6), trunkMat);
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.3, 1.2, 10), trunkMat);
       trunk.position.y = 0.6;
       trunk.castShadow = true;
       tree.add(trunk);
 
       for (let i = 0; i < 3; i++) {
         const cone = new THREE.Mesh(
-          new THREE.ConeGeometry(1.25 - i * 0.28, 1.9 - i * 0.25, 7),
-          pineMats[i]
+          new THREE.ConeGeometry(1.35 - i * 0.3, 1.3 - i * 0.15, 12),
+          acPineMats[i]
         );
-        cone.position.y = 1.65 + i * 1.05;
+        cone.position.y = 1.35 + i * 0.85;
         cone.castShadow = true;
         cone.receiveShadow = true;
         tree.add(cone);
@@ -507,19 +513,50 @@ window.SkyTerrain = (function () {
       group.add(tree);
     }
 
-    function addDeciduousTree(x, z, scale) {
+    // Plump Cloud-shaped Fruit/Hardwood Tree (Animal Crossing Oak/Fruit Tree)
+    function addCuteHardwoodTree(x, z, scale, isSakura = false) {
       const y = getTerrainHeight(x, z);
       const tree = new THREE.Group();
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.25, 1.5, 6), trunkMat);
-      trunk.position.y = 0.75;
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.32, 1.4, 10), trunkMat);
+      trunk.position.y = 0.7;
       trunk.castShadow = true;
       tree.add(trunk);
 
-      const crown = new THREE.Mesh(new THREE.DodecahedronGeometry(1.15, 0), leafMat);
-      crown.position.y = 2.05;
-      crown.castShadow = true;
-      crown.receiveShadow = true;
-      tree.add(crown);
+      const leafChoice = isSakura ? acDeciduousMats[2] : (rand() > 0.4 ? acDeciduousMats[0] : acDeciduousMats[1]);
+      
+      // Multi-sphere fluffy canopy
+      const mainPuff = new THREE.Mesh(new THREE.SphereGeometry(1.2, 14, 12), leafChoice);
+      mainPuff.position.y = 2.1;
+      mainPuff.scale.set(1.15, 0.95, 1.15);
+      mainPuff.castShadow = true;
+      tree.add(mainPuff);
+
+      const puffOffsets = [
+        [0.65, 2.2, 0.5, 0.75],
+        [-0.6, 2.3, 0.45, 0.7],
+        [0.0, 2.45, -0.65, 0.72]
+      ];
+      puffOffsets.forEach(([px, py, pz, ps]) => {
+        const subPuff = new THREE.Mesh(new THREE.SphereGeometry(ps, 10, 8), leafChoice);
+        subPuff.position.set(px, py, pz);
+        subPuff.castShadow = true;
+        tree.add(subPuff);
+      });
+
+      // Cute hanging fruits on some trees!
+      if (!isSakura && rand() > 0.4) {
+        const fruitMat = rand() > 0.5 ? fruitAppleMat : fruitOrangeMat;
+        const fruitGeo = new THREE.SphereGeometry(0.18, 8, 8);
+        [
+          [0.6, 1.7, 0.7],
+          [-0.7, 1.75, 0.5],
+          [0.1, 1.68, -0.85]
+        ].forEach(([fx, fy, fz]) => {
+          const fruit = new THREE.Mesh(fruitGeo, fruitMat);
+          fruit.position.set(fx, fy, fz);
+          tree.add(fruit);
+        });
+      }
 
       tree.position.set(x, y - 0.1, z);
       tree.scale.setScalar(scale);
@@ -537,49 +574,86 @@ window.SkyTerrain = (function () {
       const z = Math.sin(angle) * r;
       if (!isClearForProp(x, z)) continue;
 
-      const scale = 0.75 + rand() * 0.65;
-      if (rand() < 0.72) {
-        addPineTree(x, z, scale);
+      const scale = 0.8 + rand() * 0.55;
+      const treeType = rand();
+      if (treeType < 0.45) {
+        addCutePineTree(x, z, scale);
+      } else if (treeType < 0.85) {
+        addCuteHardwoodTree(x, z, scale, false);
       } else {
-        addDeciduousTree(x, z, scale);
+        addCuteHardwoodTree(x, z, scale * 1.1, true); // Sakura blossom tree
       }
       placed++;
     }
 
-    // Scattered rocks & tiny wildflowers
-    const flowerColors = ['#ff6b8b', '#ffd166', '#ffffff', '#72b5ff'];
-    for (let i = 0; i < 45; i++) {
+    // Smooth rounded river pebbles
+    for (let i = 0; i < 40; i++) {
       const angle = rand() * Math.PI * 2;
       const r = 3 + rand() * 30;
       const x = Math.cos(angle) * r;
       const z = Math.sin(angle) * r;
       if (!isClearForProp(x, z)) continue;
       const y = getTerrainHeight(x, z);
-      const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(0.3 + rand() * 0.45, 0), rockMat);
-      rock.position.set(x, y + 0.08, z);
-      rock.scale.set(1.2, 0.7, 1.0);
-      rock.rotation.set(rand(), rand(), rand());
+      const rock = new THREE.Mesh(new THREE.SphereGeometry(0.35 + rand() * 0.35, 10, 8), rockMat);
+      rock.position.set(x, y + 0.12, z);
+      rock.scale.set(1.3, 0.65, 1.0);
+      rock.rotation.set(0, rand() * Math.PI, 0);
       rock.castShadow = true;
       group.add(rock);
     }
 
-    for (let i = 0; i < 120; i++) {
+    // Cute fairy-tale mushrooms (red with white dots)
+    for (let i = 0; i < 35; i++) {
+      const angle = rand() * Math.PI * 2;
+      const r = 5 + rand() * 26;
+      const x = Math.cos(angle) * r;
+      const z = Math.sin(angle) * r;
+      if (!isClearForProp(x, z)) continue;
+      const y = getTerrainHeight(x, z);
+      const mush = new THREE.Group();
+      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 0.32, 8), mushroomStemMat);
+      stem.position.y = 0.16;
+      mush.add(stem);
+      const cap = new THREE.Mesh(new THREE.SphereGeometry(0.24, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2), mushroomCapMat);
+      cap.position.y = 0.32;
+      mush.add(cap);
+      mush.position.set(x, y, z);
+      mush.scale.setScalar(0.7 + rand() * 0.5);
+      group.add(mush);
+    }
+
+    // Plump rounded flower beds (tulips / daisies / pansies)
+    const flowerColors = ['#ff4d79', '#ffdd33', '#ffffff', '#4da6ff', '#a64dff'];
+    for (let i = 0; i < 140; i++) {
       const angle = rand() * Math.PI * 2;
       const r = 2 + rand() * 30;
       const x = Math.cos(angle) * r;
       const z = Math.sin(angle) * r;
       if (Math.hypot(x - CRATER_X, z - CRATER_Z) < 5) continue;
       const y = getTerrainHeight(x, z);
-      const fl = new THREE.Mesh(
-        new THREE.SphereGeometry(0.13, 5, 5),
-        new THREE.MeshBasicMaterial({ color: flowerColors[i % flowerColors.length] })
-      );
-      fl.position.set(x, y + 0.11, z);
-      group.add(fl);
+      
+      const flGroup = new THREE.Group();
+      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.22, 5), bushMat);
+      stem.position.y = 0.11;
+      flGroup.add(stem);
+
+      const petalColor = flowerColors[i % flowerColors.length];
+      const petalMat = new THREE.MeshStandardMaterial({ color: petalColor, roughness: 0.5 });
+      const bloom = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 8), petalMat);
+      bloom.position.y = 0.23;
+      bloom.scale.set(1.2, 0.8, 1.2);
+      flGroup.add(bloom);
+
+      const center = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), fruitOrangeMat);
+      center.position.y = 0.28;
+      flGroup.add(center);
+
+      flGroup.position.set(x, y + 0.02, z);
+      group.add(flGroup);
     }
 
-    // Lush low-poly bushes around the village & hills
-    for (let i = 0; i < 40; i++) {
+    // Lush rounded Animal Crossing bushes
+    for (let i = 0; i < 55; i++) {
       const angle = rand() * Math.PI * 2;
       const r = 4 + rand() * 28;
       const x = Math.cos(angle) * r;
@@ -588,9 +662,9 @@ window.SkyTerrain = (function () {
       const y = getTerrainHeight(x, z);
       const bush = new THREE.Group();
       for (let b = 0; b < 3; b++) {
-        const s = 0.35 + rand() * 0.25;
-        const puff = new THREE.Mesh(new THREE.DodecahedronGeometry(s, 0), bushMat);
-        puff.position.set((b - 1) * 0.28, s * 0.6, (rand() - 0.5) * 0.25);
+        const s = 0.38 + rand() * 0.22;
+        const puff = new THREE.Mesh(new THREE.SphereGeometry(s, 10, 8), bushMat);
+        puff.position.set((b - 1) * 0.3, s * 0.7, (rand() - 0.5) * 0.22);
         puff.castShadow = true;
         bush.add(puff);
       }

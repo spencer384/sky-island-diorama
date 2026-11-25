@@ -66,8 +66,8 @@
     airshipSys.setTimeMode(mode);
 
     if (mode === 'day') {
-      bloomPass.strength = 0.0;
-      renderer.toneMappingExposure = 0.96;
+      bloomPass.strength = 0.05;
+      renderer.toneMappingExposure = 1.08;
     } else if (mode === 'dusk') {
       bloomPass.strength = 0.28;
       renderer.toneMappingExposure = 1.05;
