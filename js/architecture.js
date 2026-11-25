@@ -19,6 +19,7 @@ window.SkyArchitecture = (function () {
     const roofYellow = new THREE.MeshStandardMaterial({ color: '#ffd033', roughness: 0.45 });
     const roofGreen = new THREE.MeshStandardMaterial({ color: '#44c965', roughness: 0.45 });
     const roofPurple = new THREE.MeshStandardMaterial({ color: '#b066ff', roughness: 0.45 });
+    const roofBrown = new THREE.MeshStandardMaterial({ color: '#8c532b', roughness: 0.65 });
     const bronzeMat = new THREE.MeshStandardMaterial({ color: '#d98b48', roughness: 0.35, metalness: 0.25 });
 
     const glowMat = new THREE.MeshStandardMaterial({
